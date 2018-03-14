@@ -1,0 +1,427 @@
+/*Huge Integer Code - Java
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package pkg2si4lab1;
+import java.util.Random;
+
+/**
+ *
+ * @author Areeb
+ */
+public class HugeInteger {
+    public int sign; //stores sign of integer, 0 for positive, 1 for negative
+    public int[] array;//using a integer array to represent huge integer
+    public int size;// stores the number of digits in the hige integer
+    
+    public HugeInteger(String val) throws IllegalArgumentException{
+        int flag = 1;//checks to see if the string contains the right characters
+        
+        
+        for(int i = 0; i<val.length();i++){//goes through string and checks every element
+            if ((i == 0) && (val.charAt(i) == '-')){//checks minus sign
+                flag = 1;        
+            }
+            
+            else if((val.charAt(i) >= '0') && (val.charAt(i) <= '9')){//checks if the characters are numbers
+                flag = 1;
+            }
+            
+            else{//if a character doesnt match, it breaks
+                flag = 0;
+                break;
+            }
+        }
+        
+        if (flag == 1){//if the string contains allowable charcters, then it proceeds to construct the object
+            int n,s = val.length(); 
+            int j = 0;
+            int i = 0;
+            int z = 0;
+            if ((val.charAt(0) - 48) == -3){ //checks to see if there is a minus sign at the front of the string
+                sign = 1;
+                n = s -1;
+                j = 1;
+            }
+
+            else{
+                sign = 0;
+                n = s;
+            }
+       
+            
+            while(j<s-1){//removes any leading zeroes 
+                if (val.charAt(j)== '0'){
+                    j++;
+                }
+                else
+                    break;
+            }    
+            array = new int[s-j];//set array and size
+            size = s-j;
+            
+            while((i < n) && (j < s)){//loops through and stores the remaining characters fron the string to the array
+                array[i] = val.charAt(j) - 48;
+                i++;j++;    
+            } 
+        }
+        else//if characters are not valid, then program throws exception
+            throw new IllegalArgumentException("Invalid Input");
+    }
+        
+    
+    
+    public HugeInteger(int n) throws IllegalArgumentException{
+       
+        if(n > 0){//makes sure the input is valid
+           
+            Random num = new Random();//use random class to generate random number
+            int temp;//stores the digit
+            size = n;
+            array = new int[n];
+            sign = num.nextInt(2);//randomly selects the sign of the integer
+            
+            temp = num.nextInt(10);
+            
+            while(temp == 0){//checks to see if the first integer is 0
+                temp = num.nextInt(10);//keeps generating integers until 0 is not found
+            }
+
+            array[0] = temp;
+
+            for(int i =1; i<n; i++){//fill the rest of the array with the random integers
+                temp = num.nextInt(10);
+                array[i] = temp; 
+            }
+        }
+        
+        else//for inputs that are not valid
+            throw new IllegalArgumentException("Invalid Input"); 
+
+    }
+   
+    
+    public HugeInteger add(HugeInteger h){
+        int add = 0;//stores the total sum of the digits added
+        int carry = 0;//stores the carrying value
+        int val;//stores the value then gets added into the string
+        int i,j;
+        int[] large,sh;//stores larger and smaller array
+        String sum = new String();//stores the sum of the 2 numbers
+        int neg = 0;//represents the sign of the sum of the 2 integers
+        HugeInteger a;//stores the sum of the 2 huge integers
+        
+        if (sign == 0 && h.sign == 1){//checks to see if first number is positive and second is negative
+            h.sign =0;
+            a = this.subtract(h);//calls subtract fuction
+            h.sign = 1;
+            return a;
+        }
+        
+        if(sign ==1 && h.sign == 0){//checks to see if first number is negative and second is positive
+            sign =0;
+            a = h.subtract(this);//calls subtract function
+            sign = 1;
+            return a;
+        }
+        
+        if (sign ==1 && h.sign ==1){//checks to see if first number is negative and second is negative
+            neg =1;//sets final sum to have a minus sign in front
+        }
+        
+        else{}//handles the case if both are positive
+      
+        
+        if (size > h.size){//if first array is larger than second array
+            i = size-1;
+            j = h.size -1;
+            large = array;//copy of first arrray
+            sh = h.array;//copy of second array
+        }
+        
+        else{//second array is larger or equal to first array
+            i = h.size-1;
+            j = size -1;
+            large = h.array;
+            sh = array;
+        }
+        
+        while(i>=0 && j>=0){//loop through both arrays and add each corresponding integers
+            add = large[i] + sh[j] + carry;
+            carry = add/10;
+            val = add%10;
+            sum = val + sum;
+            i--;j--;   
+        }
+        
+        while(i>=0){//go through the remaining part of larger array and add the reaming values
+            add = large[i] + carry;
+            carry = add/10;
+            val = add%10;
+            sum = val + sum;
+            i--;
+        }
+        
+        if (carry >0){//checks if carry there still is a carrying amount
+            sum = carry + sum;
+        }
+        if (neg ==1){
+            sum = '-' + sum;
+        }
+        
+        return new HugeInteger(sum);//returns new huge integer object 
+        
+    }        
+    
+    public HugeInteger subtract(HugeInteger h){
+        int carry =0,val;//stores the carry and integer stored in decimal place
+        int i,j,s;
+        int[] large,sh;//represent the large and short arrays
+        String output = new String();//stores the subtraction of the 2 integers
+        int neg = 0;//represents the possibility of a negative sign infornt of tje difference
+        HugeInteger a;//stores the difference of the 2 integers 
+        
+        if (sign == 0 && h.sign ==1){//checks to see if first number is positive and second is negative
+            h.sign =0;
+            a = this.add(h);//calls add function
+            h.sign = 1;
+            return a;
+        }
+        
+        if (sign == 1 && h.sign ==0){//checks to see if first number is negative and second is positive
+            h.sign =1;
+            a = this.add(h);//calls add function
+            h.sign = 0;
+            return a;
+        }
+        
+        if (sign ==1 && h.sign ==1){//checks to see if first number is negative and second is negative
+            h.sign =0;sign =0;
+            a = h.subtract(this);//calls subtract function
+            h.sign =1;sign =1;
+            return a;
+        }
+        
+        else{}//if both numbers are positive
+        
+        
+        if (size > h.size){//checks to see first number is bigger than second
+            s = size;
+            i = size-1;
+            j = h.size -1;
+            large = array;
+            sh = h.array;
+        }
+        
+        else if(size == h.size){//checks to see if equal in size
+            if(this.compareTo(h) == -1){
+                s = h.size;
+                i = h.size-1;
+                j = size -1;
+                large = h.array;
+                sh = array;
+                neg = 1;
+            }
+            else if(this.compareTo(h) ==0){
+                return new HugeInteger("0");
+            }
+            else{
+                s = size;
+                i = size-1;
+                j = h.size -1;
+                large = array;
+                sh = h.array;
+            }
+            
+        }
+        
+        else{//first number is larger than second in size
+            s = h.size;
+            i = h.size-1;
+            j = size -1;
+            large = h.array;
+            sh = array;
+            neg = 1;
+        } 
+        
+        while (i>=0 && j>=0 ){//go through both integer arrays
+            
+            if ((large[i] - sh[j] + carry)<0){//carry is reqired based on subtraction
+                val = 10 + large[i] - sh[j] + carry;
+                carry = -1;
+            }
+            
+            else{//carry is not required based on subtraction
+                val = large[i] - sh[j] + carry;
+                carry = 0;
+            }
+            
+            output = val + output;//stores value of indivudual subtraction
+            i--;j--;
+        }
+            
+        while (i>=0){//does the same thing as above but with the remaining digits in the larger array
+            if (large[i] + carry <0){
+                val = large[i] + carry; 
+                carry = -1;
+            }
+            else{
+                val = large[i] + carry;
+                carry =0;
+            }
+            output = val + output;
+            i--;
+        }
+        
+        if(neg == 1)//checks to see if a negative sign is required at the begining of string
+            output = '-' + output;
+        
+        return new HugeInteger(output);        
+        
+    }
+    
+    public HugeInteger multiply(HugeInteger h){
+        String output = new String();//stores the product of one digit with one numnber
+        HugeInteger prod = new HugeInteger("0");//stores the multiplication of 2 huge integers
+        HugeInteger a;
+        int[] large,sh; //stores larger and smaller number
+        int i,j,k,neg;
+        int mul,carry=0,val; 
+        
+        if ((sign == 1 && h.sign ==0) || (sign == 0 && h.sign ==1)){//checks if any one of the numbers are negative
+            neg =1;
+        } 
+        else
+            neg =0;
+        
+        
+        if (size > h.size){//checking the size of both numbers 
+            large = array;//copy the contents of the larger array into large
+            sh = h.array;//copy the contents of the smaller array into sh
+            i = h.size-1;
+            j = size -1;
+        }
+        else{
+            large = h.array;
+            sh = array;
+            i = size-1;
+            j = h.size -1;
+        }
+        
+        while (i>=0){//going through the smaller array of digits
+           
+            k = sh.length -1 - i;//represents counter that determines how many zeroes to put in front
+            
+            output = "";//empty the string
+            
+            while(k>0){//based on the number of digits in the samller array, this adds zeroes infront 
+                output += "0";
+                k--;
+            }
+            
+            j = large.length -1;//starting the increment variable at the back of the larger array
+            carry =0;
+            
+            while(j>=0){//goes through the larger array 
+                mul = (large[j]* sh[i])+carry;//multiplies the digit from the smaller array by all the digits in the large array
+                carry = mul/10;//determining carry
+                val = mul%10;//determining value that goes into the output string
+                
+                if(j !=0){//checks if we are multiplying by the first digit in the large array
+                    output = val + output;
+                }
+                else{
+                    output = mul + output;
+                }
+                j--;    
+            }
+            a = new HugeInteger(output);//create a temporary huge int
+            prod = prod.add(a);//add it to the final huge integer
+        
+           
+            i--;
+            
+        }
+        if (neg ==1){//checks if we have to add a negative or not to the final product
+            prod.sign = 1;
+        }   
+               
+        return prod;
+          
+    }
+    
+    
+    public int compareTo(HugeInteger h){
+        
+        if (sign == 1 && h.sign == 0){//first checking and comparing the signs of the 2 integers
+            return -1;
+        } 
+        else if (sign ==0 && h.sign == 1){
+            return 1;
+        }
+        else if (sign ==0 && h.sign == 0){ //2 positive integers
+            if (size > h.size){//first checking the size of the positive integers
+                return 1;
+            }
+            else if(size < h.size){
+                return -1;
+            }
+            else{//both have same size so now comparing each digit stored in the array
+                for (int i =0;i<size;i++){
+                    if (array[i] > h.array[i]){
+                        return 1;
+                    }
+                    else if (array[i] < h.array[i]){
+                        return -1;
+                    }
+                }
+                return 0;//if both integers are the same
+            }
+            
+        }
+        else{//2 negative integers 
+            if (size > h.size){//comparing the size of the 2 negative integers
+                return -1;
+            }
+            else if(size < h.size){
+                return 1;
+            }
+            else{//going through the digits and comparing them to see if which integer is larger or smaller
+                for (int i =0;i<size;i++){
+                    if (array[i] > h.array[i]){
+                        return -1;
+                    }
+                    else if (array[i] < h.array[i]){
+                        return 1;
+                    }
+                }
+                return 0;//if both integers are the same
+            }
+        }
+    }
+        
+        
+    
+    
+    
+    public String toString(){
+        String output = new String();//create a string to store digits of array
+        
+        if (sign == 1){//checking sign to see if need to add negative in front or not
+            output += '-';
+        }
+                
+        for(int i =0;i < size;i++){//copying the values of the array into the string
+            output += array[i];
+        }
+        
+        output += '\n';
+        
+        return output;
+        
+    }
+
+
+
+}
