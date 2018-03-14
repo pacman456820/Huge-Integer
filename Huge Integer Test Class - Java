@@ -1,0 +1,65 @@
+/*Huge Integer Test Class
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package pkg2si4lab1;
+
+/**
+ *
+ * @author Areeb
+ */
+public class Main {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        HugeInteger a = new HugeInteger("999");
+        HugeInteger b = new HugeInteger("1999");
+        HugeInteger c = new HugeInteger("-1559");  
+        HugeInteger d = new HugeInteger(6);
+        HugeInteger e = new HugeInteger(7); 
+        
+        try{
+            HugeInteger f = new HugeInteger("-003456u");
+        }
+        catch(IllegalArgumentException z){
+            System.out.println("Invalid argument in constructor 1");
+        }
+        
+        try{
+            HugeInteger g = new HugeInteger(-9);
+        }
+        catch(IllegalArgumentException z){
+            System.out.println("Invalid argument in constructor 2");
+        }
+        
+        
+        
+        System.out.print("Printing Huge Integers\n");
+        System.out.print(a.toString());
+        System.out.print(b.toString());
+        System.out.print(c.toString());
+        System.out.print(d.toString());
+        System.out.print(e.toString());
+        
+        
+        System.out.print("Printing addition\n");
+        System.out.print(a.add(b));
+        System.out.print(b.add(c));
+        System.out.print(a.add(c));
+        
+        
+        System.out.print("Printing subtraction\n");
+        System.out.print(a.subtract(b));
+        System.out.print(b.subtract(c));
+        System.out.print(a.subtract(c));
+                        
+        System.out.print("Printing multiplication\n");
+        System.out.print(a.multiply(b));
+        System.out.print(b.multiply(a));
+        System.out.print(a.multiply(c));
+    }
+    
+}
